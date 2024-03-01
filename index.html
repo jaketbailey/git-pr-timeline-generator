@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>My GitHub Gantt Chart</title>
+    <style>
+        #gantt {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+    <script type="module">
+        const token = '';
+
+        const getRepo = async () => {
+            const response = await fetch('https://api.github.com/repos/jaketbailey/final-year-project', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            const repoData = await response.json();
+            console.log(repoData);
+
+            // Get merges list
+            const mergesResponse = await fetch(repoData.merges_url, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            const mergesData = await mergesResponse.json();
+
+            console.log(mergesData);
+
+            // Get commit list
+            // const commitsResponse = await fetch(repoData.commits_url.replace('{/sha}', '') + '?per_page=50', {
+            //     headers: {
+            //         Authorization: `Bearer ${token}`,
+            //     },
+            // });
+
+            // const commitsData = await commitsResponse.json();
+            // console.log(commitsData);
+
+            // Create Gantt chart based on commits and pull requests
+            let ganttChart = 'gantt\n';
+            ganttChart += '  dateFormat  YYYY-MM-DD\n';
+            ganttChart += '  title My GitHub Gantt Chart\n';
+            ganttChart += '  excludes weekends\n';
+
+            // commitsData.forEach((commit, index) => {
+            //     if (commit.pull_request) {
+            //         ganttChart += `  section ${commit.pull_request.title}\n`;
+            //         ganttChart += `    ${commit.pull_request.body} : ${commit.commit.author.name}, ${commit.commit.author.date}, 1d\n`;
+            //     }
+            // });
+
+            // console.log(ganttChart);
+
+            // Create commit graph
+            // let commitGraph = 'gitGraph\n';
+
+            // commitsData.forEach((commit, index) => {
+            //     commitGraph += `  commit id: "${(commit.sha).substring(0,4)}"\n`;
+
+            //     if (commit.branch) {
+            //         commitGraph += `  branch ${commit.branch}\n`;
+            //     }
+
+            //     commitGraph += `  checkout ${commit.branch || 'main'}\n`;
+
+            //     if (commit.merge) {
+            //         commitGraph += `  merge ${commit.branch} id: "${commit.mergeId}" tag: "${commit.mergeTag}" type: ${commit.mergeType}\n`;
+            //     }
+            // });
+
+            // console.log(commitGraph);
+        };
+
+        document.addEventListener('DOMContentLoaded', getRepo);
+    </script>    
+    <button id="download" >Download</button>
+
+
+    <pre id="gantt" class="mermaid"">
+        gantt
+        dateFormat  YYYY-MM-DD
+        title       Adding GANTT diagram functionality to mermaid
+        excludes    weekends
+        %% (`excludes` accepts specific dates in YYYY-MM-DD format, days of the week ("sunday") or "weekends", but not the word "weekdays".)
+
+        section A section
+        Completed task            :done,    des1, 2014-01-06,2014-01-08
+        Active task               :active,  des2, 2014-01-09, 3d
+        Future task               :         des3, after des2, 5d
+        Future task2              :         des4, after des3, 5d
+
+        section Critical tasks
+        Completed task in the critical line :crit, done, 2014-01-06,24h
+        Implement parser and jison          :crit, done, after des1, 2d
+        Create tests for parser             :crit, active, 3d
+        Future task in critical line        :crit, 5d
+        Create tests for renderer           :2d
+        Add to mermaid                      :1d
+        Functionality added                 :milestone, 2014-01-25, 0d
+
+        section Documentation
+        Describe gantt syntax               :active, a1, after des1, 3d
+        Add gantt diagram to demo page      :after a1  , 20h
+        Add another diagram to demo page    :doc1, after a1  , 48h
+
+        section Last section
+        Describe gantt syntax               :after doc1, 3d
+        Add gantt diagram to demo page      :20h
+        Add another diagram to demo page    :48h
+    </pre>
+
+    <pre class="mermaid">
+        gantt
+        dateFormat  YYYY-MM-DD
+        title My GitHub Gantt Chart
+        excludes weekends
+        section Jake Bailey
+        Merge pull request #147 from jaketbailey/increment-3
+
+        Increment 3 : Jake Bailey, 2024-02-01T19:03:10Z, 1d
+        section Jake Bailey
+            Merge pull request #146 from jaketbailey/143-sr50---the-system-must-provide-an-export-to-garmin-routes-should
+
+        143 sr50   the system must provide an export to garmin routes should : Jake Bailey, 2024-02-01T18:58:36Z, 1d
+        section Jake Bailey
+            gui feedback : Jake Bailey, 2024-02-01T18:52:15Z, 1d
+        section Jake Bailey
+            create route and export to garmin courses works completely end-to-end : Jake Bailey, 2024-02-01T18:32:40Z, 1d
+        section Jake Bailey
+            create route and export to garmin courses works completely end-to-end : Jake Bailey, 2024-02-01T18:32:25Z, 1d
+        section Jake Bailey
+            it works! just need to get the front end to make the final api call : Jake Bailey, 2024-02-01T14:30:45Z, 1d
+        section Jake Bailey
+            Revert "broken, but making progress"
+
+        This reverts commit daf85537c36ecdd763587456fcc532adfe1b2e51. : Jake Bailey, 2024-02-01T13:46:32Z, 1d
+        section Jake Bailey
+            broken, but making progress : Jake Bailey, 2024-02-01T12:49:39Z, 1d
+        section Jake Bailey
+            get token endpoint set up for garmin : Jake Bailey, 2024-01-26T16:57:53Z, 1d
+        section Jake Bailey
+            basic functionality set up, need to sort oauth : Jake Bailey, 2024-01-26T14:55:14Z, 1d
+        section Jake Bailey
+            create garmin json : Jake Bailey, 2024-01-26T14:05:52Z, 1d
+        section Jake Bailey
+            Merge pull request #145 from jaketbailey/sr51--the-system-must-provide-an-option-to-share-to-different-social-media-platforms
+
+        Sr51  the system must provide an option to share to different social media platforms : Jake Bailey, 2024-01-25T15:23:50Z, 1d
+        section Jake Bailey
+            minor : Jake Bailey, 2024-01-25T15:22:33Z, 1d
+        section Jake Bailey
+            share reddit : Jake Bailey, 2024-01-25T15:13:01Z, 1d
+        section Jake Bailey
+            share to twitter/x : Jake Bailey, 2024-01-25T15:09:42Z, 1d
+        section Jake Bailey
+            removed logs : Jake Bailey, 2024-01-25T14:54:11Z, 1d
+        section Jake Bailey
+            update gitignore : Jake Bailey, 2024-01-25T14:37:32Z, 1d
+        section Jake Bailey
+            nearly there : Jake Bailey, 2024-01-25T14:36:31Z, 1d
+        section Jake Bailey
+            minor updates : Jake Bailey, 2024-01-24T21:07:05Z, 1d
+        section Jake Bailey
+            generate screenshot : Jake Bailey, 2024-01-24T20:46:03Z, 1d
+        section Jake Bailey - UP2002753
+            Merge pull request #142 from jaketbailey/sr46-the-system-must-provide-an-option-within-the-route-planning-modal-to-select-the-rider-type
+
+        Sr46 the system must provide an option within the route planning modal to select the rider type : Jake Bailey - UP2002753, 2024-01-23T15:04:03Z, 1d
+        section Jake Bailey
+            set to auto select on load : Jake Bailey, 2024-01-23T14:57:25Z, 1d
+        section Jake Bailey
+            select different rider profile : Jake Bailey, 2024-01-19T21:42:01Z, 1d
+        section Jake Bailey - UP2002753
+            Merge pull request #141 from jaketbailey/sr48-the-system-must-provide-an-import-option-for-gpx-files
+
+        Sr48 the system must provide an import option for gpx files : Jake Bailey - UP2002753, 2024-01-19T19:00:39Z, 1d
+        section Jake Bailey
+            fixed styles : Jake Bailey, 2024-01-19T18:50:08Z, 1d
+        section Jake Bailey
+            minor changes : Jake Bailey, 2024-01-19T18:25:23Z, 1d
+        section Jake Bailey
+            fixed export : Jake Bailey, 2024-01-19T17:51:27Z, 1d
+        section Jake Bailey
+            geojson/gpx import working : Jake Bailey, 2024-01-19T17:45:23Z, 1d
+        section Jake Bailey
+            minor : Jake Bailey, 2024-01-19T17:10:51Z, 1d
+        section Jake Bailey
+            custom geocoder fully working : Jake Bailey, 2024-01-19T16:58:17Z, 1d
+        section Jake Bailey
+            custom geocoder setup with here api : Jake Bailey, 2024-01-19T16:06:53Z, 1d
+        section Jake Bailey
+            loadgpx kindof working : Jake Bailey, 2024-01-18T21:24:58Z, 1d
+        section Jake Bailey - UP2002753
+            Merge pull request #140 from jaketbailey/sr11-the-update-preferences-overlay-must-provide-a-round-trip-user-input-field
+
+        Sr11 the update preferences overlay must provide a round trip user input field, ready to close as functionality is complete : Jake Bailey - UP2002753, 2024-01-18T20:59:08Z, 1d
+        section Jake Bailey
+            hide all in between markers : Jake Bailey, 2024-01-18T20:57:25Z, 1d
+        section Jake Bailey
+            all working : Jake Bailey, 2024-01-18T20:20:12Z, 1d
+        section Jake Bailey
+            fixed checkbox : Jake Bailey, 2024-01-18T19:50:23Z, 1d
+        section Jake Bailey
+            fixed issue : Jake Bailey, 2024-01-18T17:21:37Z, 1d
+        section Jake Bailey
+            save route after close works, but I need to fix gui for round trip mode : Jake Bailey, 2024-01-18T14:33:57Z, 1d
+        section Jake Bailey
+            browser confirm to load previous route : Jake Bailey, 2024-01-18T10:37:10Z, 1d
+        section Jake Bailey
+            minor updates : Jake Bailey, 2024-01-17T23:38:36Z, 1d
+        section Jake Bailey
+            jsdoc : Jake Bailey, 2024-01-17T17:17:51Z, 1d
+        section Jake Bailey
+            major improvements : Jake Bailey, 2024-01-17T16:41:41Z, 1d
+        section Jake Bailey
+            major improvements : Jake Bailey, 2024-01-17T16:08:34Z, 1d
+        section Jake Bailey
+            very nearly working : Jake Bailey, 2024-01-16T22:51:46Z, 1d
+        section Jake Bailey
+            major round trip improvements : Jake Bailey, 2024-01-16T22:00:25Z, 1d
+        section Jake Bailey
+            line now plots : Jake Bailey, 2024-01-16T18:59:25Z, 1d
+        section Jake Bailey
+            support for round-trip kind of working : Jake Bailey, 2024-01-15T21:39:12Z, 1d
+        section Jake Bailey - UP2002753
+            Merge pull request #139 from jaketbailey/109-sr39-both-hazard-and-infrastructure-data-should-be-displayed-on-the-map-with-an-option-to-toggle-onoff-and-report-errors
+
+        sr39 both hazard and infrastructure data should be displayed on the map with an option to toggle onoff and report errors : Jake Bailey - UP2002753, 2024-01-15T18:39:19Z, 1d
+        section Jake Bailey
+            go mod tidy : Jake Bailey, 2024-01-15T18:37:58Z, 1d
+        section Jake Bailey
+            input validation : Jake Bailey, 2024-01-15T18:37:05Z, 1d
+    </pre>
+
+</body>
+</html>
