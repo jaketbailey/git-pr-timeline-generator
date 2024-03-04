@@ -2,19 +2,30 @@ import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.mi
 mermaid.initialize({ startOnLoad: true });
 
 import { App, Octokit } from "https://esm.sh/octokit";
+
+// Change the token to your own
 const token = '';
+// Change the username and repo to your own
 const username = "jaketbailey";
 const repo = "final-year-project";
 
 const octokit = new Octokit({ auth: token });
 
+const name = document.createElement("h1");
+name.textContent = "";
+document.body.appendChild(name);
+
+const p = document.createElement("p");
+p.textContent = "Loading...";
+document.body.appendChild(p);
+
 const {
     data: { login },
 } = await octokit.rest.users.getAuthenticated();
 console.log("Hello, %s", login);
+name.textContent = `Hello, ${login}`;
 
 const { data: repos } = await octokit.rest.repos.listForAuthenticatedUser();
-console.log(repos);
 
 const prs = await octokit.rest.search.issuesAndPullRequests({
     q: `type:pr+repo:${username}/${repo}+created:>=2022-01-01`,
@@ -27,7 +38,7 @@ let branchCheck = false;
 
 let mermaidCommit = ``;
 mermaidCommit += `---\n`;
-mermaidCommit += `title: "@jaketbailey/final-year-project"\n`;
+mermaidCommit += `title: "@${username}/${repo}"\n`;
 mermaidCommit += `---\n`;
 mermaidCommit += `gitGraph\n`;
 mermaidCommit += `  commit id: "Initial commit"\n`;
@@ -35,7 +46,7 @@ let previousBase = "";
 
 let ganttText = `
 gantt
-    title Final Year Project
+    title @${username}/${repo}
     dateFormat  YYYY-MM-DD
 `;
 
@@ -44,6 +55,7 @@ const len = prs.data.items.length;
 
 for (const pr of prs.data.items.reverse()) {
     console.log(`Processing PR ${i + 1} of ${len}`)
+    p.textContent = `Processing PR ${i + 1} of ${len}`;
     const { data: prBranch } = await octokit.rest.pulls.get({
         owner: username,
         repo: repo,
@@ -53,7 +65,7 @@ for (const pr of prs.data.items.reverse()) {
     branchCheck = branchArr.includes(prBranch.base.ref);
 
     if (i === 0) {
-        ganttText += `    section ${prBranch.base.ref}\n`;co
+        ganttText += `    section ${prBranch.base.ref}\n`;
         mermaidCommit += `  branch ${prBranch.base.ref}\n`
         mermaidCommit += `  checkout ${prBranch.base.ref}\n`;
     } else {
@@ -73,8 +85,6 @@ for (const pr of prs.data.items.reverse()) {
         }
     }
     
-    console.log(prBranch);
-
     previousBase = prBranch.base.ref;
 
     const { data: commits } = await octokit.rest.pulls.listCommits({
@@ -85,7 +95,6 @@ for (const pr of prs.data.items.reverse()) {
 
     if (commits.length > 0) {
         const earliestCommit = commits[0];
-        console.log("Earliest commit:", earliestCommit.commit.author.date.split('T')[0]);
         ganttText += `    ${prBranch.title}     :${earliestCommit.commit.author.date.split('T')[0]}, ${prBranch.closed_at.split('T')[0]}\n`;
     }
 
@@ -93,16 +102,41 @@ for (const pr of prs.data.items.reverse()) {
     i++;
 }
 
+p.style.display = "none";
+
 const gitGraph = document.createElement("pre");
 gitGraph.textContent = mermaidCommit;
 gitGraph.classList.add("mermaid");
 document.body.appendChild(gitGraph);
-console.log(merges);
 
 const gantt = document.createElement("pre");
 gantt.textContent = ganttText;
-console.log(gantt.textContent);
 gantt.classList.add("mermaid");
 document.body.appendChild(gantt);
 
 await mermaid.run({ nodes: document.querySelectorAll(".mermaid") });
+
+function downloadSvg(svgElement, filename) {
+    // Serialize the SVG to a string
+    const serializer = new XMLSerializer();
+    const svgStr = serializer.serializeToString(svgElement);
+
+    // Convert the SVG string to a data URL
+    const svgDataUrl = 'data:image/svg+xml;base64,' + btoa(svgStr);
+
+    // Create a new download link
+    const downloadLink = document.createElement('a');
+    downloadLink.href = svgDataUrl;
+    downloadLink.download = filename;
+
+    // Simulate a click on the link
+    downloadLink.click();
+}
+
+// Get the SVG elements for the diagrams
+const gitGraphSvg = gitGraph.querySelector('svg');
+const ganttSvg = gantt.querySelector('svg');
+
+// Download the diagrams
+downloadSvg(gitGraphSvg, 'gitGraph.svg');
+downloadSvg(ganttSvg, 'gantt.svg');
