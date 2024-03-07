@@ -1,5 +1,8 @@
 import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-mermaid.initialize({ startOnLoad: true });
+mermaid.initialize({ 
+    startOnLoad: true,
+    theme: 'default'
+});
 
 import { App, Octokit } from "https://esm.sh/octokit";
 
@@ -10,6 +13,10 @@ const username = "jaketbailey";
 const repo = "final-year-project";
 
 const octokit = new Octokit({ auth: token });
+
+String.prototype.trimEllip = function (length) {
+    return this.length > length ? this.substring(0, length) + "..." : this;
+}
 
 const name = document.createElement("h1");
 name.textContent = "";
@@ -95,10 +102,10 @@ for (const pr of prs.data.items.reverse()) {
 
     if (commits.length > 0) {
         const earliestCommit = commits[0];
-        ganttText += `    ${prBranch.title}     :${earliestCommit.commit.author.date.split('T')[0]}, ${prBranch.closed_at.split('T')[0]}\n`;
+        ganttText += `    ${prBranch.title.trimEllip(25)}     :${earliestCommit.commit.author.date.split('T')[0]}, ${prBranch.closed_at.split('T')[0]}\n`;
     }
 
-    mermaidCommit += `  commit id: "${pr.title}"\n`;
+    mermaidCommit += `  commit id: "${await pr.title.trimEllip(25)}"\n`;
     i++;
 }
 
@@ -138,5 +145,8 @@ const gitGraphSvg = gitGraph.querySelector('svg');
 const ganttSvg = gantt.querySelector('svg');
 
 // Download the diagrams
-downloadSvg(gitGraphSvg, 'gitGraph.svg');
-downloadSvg(ganttSvg, 'gantt.svg');
+
+if (window.confirm("Do you want to download a copy of the diagrams?")) {
+    downloadSvg(gitGraphSvg, 'gitGraph.svg');
+    downloadSvg(ganttSvg, 'gantt.svg');
+}
