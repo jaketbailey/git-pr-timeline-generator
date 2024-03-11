@@ -7,7 +7,7 @@ mermaid.initialize({
 import { App, Octokit } from "https://esm.sh/octokit";
 
 // Change the token to your own
-const token = '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';
+const token = '';
 // Change the username and repo to your own
 const username = "jaketbailey";
 const repo = "final-year-project";
