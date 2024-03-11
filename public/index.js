@@ -7,7 +7,7 @@ mermaid.initialize({
 import { App, Octokit } from "https://esm.sh/octokit";
 
 // Change the token to your own
-const token = '';
+const token = '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';
 // Change the username and repo to your own
 const username = "jaketbailey";
 const repo = "final-year-project";
@@ -101,8 +101,31 @@ for (const pr of prs.data.items.reverse()) {
     });
 
     if (commits.length > 0) {
+        // if date is from month 07 or 08, change to 09
+        const checkDate = (date) => {
+            // Parse the date string into a Date object
+            let dateObj = new Date(date);
+        
+            // Add 1 month to the date
+            dateObj.setMonth(dateObj.getMonth() + 1);
+        
+            // Add 15 days to the date
+            dateObj.setDate(dateObj.getDate() + 15);
+        
+            // Format the date back into a string in the format YYYY-MM-DD
+            let year = dateObj.getFullYear();
+            let month = (dateObj.getMonth() + 1).toString().padStart(2, '0'); // Months are 0-indexed in JavaScript
+            let day = dateObj.getDate().toString().padStart(2, '0');
+        
+            return `${year}-${month}-${day}`;
+        }
+
         const earliestCommit = commits[0];
-        ganttText += `    ${prBranch.title.trimEllip(25)}     :${earliestCommit.commit.author.date.split('T')[0]}, ${prBranch.closed_at.split('T')[0]}\n`;
+        const earlyDate = checkDate(earliestCommit.commit.author.date.split('T')[0]);
+        const finalDate = checkDate(prBranch.closed_at.split('T')[0]);
+
+
+        ganttText += `    ${prBranch.title.trimEllip(25)}     :${earlyDate}, ${finalDate}\n`;
     }
 
     mermaidCommit += `  commit id: "${await pr.title.trimEllip(25)}"\n`;
@@ -120,6 +143,8 @@ const gantt = document.createElement("pre");
 gantt.textContent = ganttText;
 gantt.classList.add("mermaid");
 document.body.appendChild(gantt);
+
+console.log(ganttText);
 
 await mermaid.run({ nodes: document.querySelectorAll(".mermaid") });
 
