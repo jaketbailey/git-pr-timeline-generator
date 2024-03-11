@@ -107,10 +107,10 @@ for (const pr of prs.data.items.reverse()) {
             let dateObj = new Date(date);
         
             // Add 1 month to the date
-            dateObj.setMonth(dateObj.getMonth() + 1);
+            dateObj.setMonth(dateObj.getMonth() + 0); // Add months if needed
         
             // Add 15 days to the date
-            dateObj.setDate(dateObj.getDate() + 15);
+            dateObj.setDate(dateObj.getDate() + 0); // Add days if needed
         
             // Format the date back into a string in the format YYYY-MM-DD
             let year = dateObj.getFullYear();
